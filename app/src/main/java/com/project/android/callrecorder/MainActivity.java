@@ -1,6 +1,5 @@
 package com.project.android.callrecorder;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -10,16 +9,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.Build;
-import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import com.project.android.callrecorder.Fragments.Contact_Fragment;
+import com.project.android.callrecorder.Fragments.recent_fragment;
+import com.project.android.callrecorder.Model.Contact_Data;
+import com.project.android.callrecorder.Other.DeviceAdminDemo;
+import com.project.android.callrecorder.Service.TService;
 
 import java.util.ArrayList;
 import java.util.List;

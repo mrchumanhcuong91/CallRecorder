@@ -1,4 +1,4 @@
-package com.project.android.callrecorder;
+package com.project.android.callrecorder.Other;
 
 import android.app.admin.DeviceAdminReceiver;
 import android.content.Context;

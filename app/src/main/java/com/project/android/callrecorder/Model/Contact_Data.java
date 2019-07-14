@@ -1,4 +1,4 @@
-package com.project.android.callrecorder;
+package com.project.android.callrecorder.Model;
 
 public class Contact_Data {
     private String name;

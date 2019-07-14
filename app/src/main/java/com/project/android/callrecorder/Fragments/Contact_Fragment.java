@@ -1,19 +1,21 @@
-package com.project.android.callrecorder;
+package com.project.android.callrecorder.Fragments;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.PermissionChecker;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.project.android.callrecorder.Adapter.ContactAdapter;
+import com.project.android.callrecorder.Other.DividerItemDecorator;
+import com.project.android.callrecorder.Model.Contact_Data;
+import com.project.android.callrecorder.R;
 
 import java.util.ArrayList;
 import java.util.List;

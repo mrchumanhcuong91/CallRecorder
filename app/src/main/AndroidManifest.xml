@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <receiver
-            android:name="com.project.android.callrecorder.DeviceAdminDemo"
+            android:name="com.project.android.callrecorder.Other.DeviceAdminDemo"
             android:permission="android.permission.BIND_DEVICE_ADMIN" >
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
@@ -37,7 +37,7 @@
                 <action android:name="android.app.action.DEVICE_ADMIN_DISABLE_REQUESTED" />
             </intent-filter>
         </receiver>
-        <service android:enabled="true" android:name="com.project.android.callrecorder.TService"/>
+        <service android:enabled="true" android:name="com.project.android.callrecorder.Service.TService"/>
 
     </application>
 
