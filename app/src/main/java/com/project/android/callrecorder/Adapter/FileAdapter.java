@@ -60,9 +60,16 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder vh, final int position){
         Audio_model model = listData.get(position);
+//        boolean incoming = false;
+        String name_file = model.getFileName();
+        if(!name_file.contains("incoming")){
+//            incoming = true;
+            //set incon incoming
+        }
+        String[] temp = name_file.split("_");
 
-        vh.nameFile.setText(model.getFileName());
-        vh.timeLong.setText(model.getTime());
+        vh.nameFile.setText(temp[1]);
+        vh.timeLong.setText(temp[2]);
         vh.bind(model, listener);
 
     }

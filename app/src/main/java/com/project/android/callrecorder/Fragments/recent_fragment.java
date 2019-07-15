@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,8 +60,9 @@ public class recent_fragment extends Fragment {
             for (int i =0;i < files.length;i++){
 
                 String name_file = files[i].getName();
-                String name_path_file = path +"/"+name_file;
-                Audio_model model = new Audio_model(name_path_file);
+//                String name_path_file = path +"/"+name_file;
+//                Log.e("Audio_file",name_path_file);
+                Audio_model model = new Audio_model(name_file);
                 data.add(model);
             }
         }

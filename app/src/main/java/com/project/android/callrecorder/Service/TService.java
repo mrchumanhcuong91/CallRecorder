@@ -5,10 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
+import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -67,6 +70,7 @@ public class TService extends Service {
         Bundle bundle;
         String state;
         String inCall, outCall;
+        String contacName;
         public boolean wasRinging = false;
 
         private void startRecord(String seed) {
@@ -75,7 +79,9 @@ public class TService extends Service {
             if (!sampleDir.exists()) {
                 sampleDir.mkdirs();
             }
-            String file_name = "Record" + seed;
+            String file_name = seed + "_" + out;
+            //parse string seed
+
             try {
                 audiofile = File.createTempFile(file_name, ".amr", sampleDir);
             } catch (IOException e) {
@@ -109,6 +115,7 @@ public class TService extends Service {
                     state = bundle.getString(TelephonyManager.EXTRA_STATE);
                     if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
                         inCall = bundle.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
+                        contacName = getContactName(inCall, context);
                         wasRinging = true;
                         Toast.makeText(context, "IN : " + inCall, Toast.LENGTH_LONG).show();
                     } else if (state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
@@ -116,7 +123,7 @@ public class TService extends Service {
 
                             Toast.makeText(context, "ANSWERED", Toast.LENGTH_LONG).show();
 
-                            startRecord("incoming"+inCall);
+                            startRecord("incoming_"+contacName);
                         }
                     } else if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
                         wasRinging = false;
@@ -131,7 +138,8 @@ public class TService extends Service {
                 if ((bundle = intent.getExtras()) != null) {
                     outCall = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
                     Toast.makeText(context, "OUT : " + outCall, Toast.LENGTH_LONG).show();
-                    startRecord("outgoing"+outCall);
+                    contacName = getContactName(outCall, context);
+                    startRecord("outgoing_"+contacName);
                     if ((bundle = intent.getExtras()) != null) {
                         state = bundle.getString(TelephonyManager.EXTRA_STATE);
                         if (state != null) {
@@ -150,9 +158,40 @@ public class TService extends Service {
                 }
             }
         }
+        private String getContactName(String number, Context context) {
+            String contactName = "";
+
+            // // define the columns I want the query to return
+            String[] projection = new String[] {
+                    ContactsContract.PhoneLookup.DISPLAY_NAME,
+                    ContactsContract.PhoneLookup.NUMBER,
+                    ContactsContract.PhoneLookup.HAS_PHONE_NUMBER };
+
+            // encode the phone number and build the filter URI
+            Uri contactUri = Uri.withAppendedPath(
+                    ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                    Uri.encode(number));
+
+            // query time
+            Cursor cursor = context.getContentResolver().query(contactUri,
+                    projection, null, null, null);
+            // querying all contacts = Cursor cursor =
+            // context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,
+            // projection, null, null, null);
+
+            if (cursor.moveToFirst()) {
+                contactName = cursor.getString(cursor
+                        .getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+            }
+            cursor.close();
+            return contactName.equals("") ? number : contactName;
+
+        }
 
 
-    }
+
+
+}
 
 
 
