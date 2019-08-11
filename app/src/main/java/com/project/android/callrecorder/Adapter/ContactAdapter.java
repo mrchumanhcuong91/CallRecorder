@@ -9,6 +9,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.project.android.callrecorder.Model.ChooseList;
 import com.project.android.callrecorder.Model.Contact_Data;
 import com.project.android.callrecorder.R;
 
@@ -17,12 +18,13 @@ import java.util.List;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> {
     public interface AdaptertoFragment{
-        void transferToFragment(int position);
+        void transferToFragment(String phoneNum);
+        void transferToFragmentRemove(String phoneNum);
     }
     public AdaptertoFragment listener;
     private List<Contact_Data> values;
     public ArrayList<Integer> chooseOut = new ArrayList<Integer>();
-    public ArrayList<Integer> chooseList;
+    public List<String> chooseList;
     public class ViewHolder extends RecyclerView.ViewHolder{
         public TextView name;
         public TextView phoneNumber;
@@ -37,21 +39,27 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             btnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                    if(btnSwitch.isChecked())
+//                        return;
                     int pos = getPosition();
+                    Contact_Data contact_data = values.get(pos);
+                    Log.e("CUONGCM",contact_data.getName() +" is set");
                     if(isChecked){
-
-                        Contact_Data contact_data = values.get(pos);
-                        Log.e("CUONGCM",contact_data.getName() +" is set");
-                        chooseOut.add(pos);
-                        listener.transferToFragment(pos);
+//                        chooseOut.add(pos);
+                        listener.transferToFragment(contact_data.getPhone());
 //                        notifyDataSetChanged();
+                    }else {
+//                        chooseOut.remove(pos);
+                        Log.e("CuongCM","transfer remove ");
+
+                        listener.transferToFragmentRemove(contact_data.getPhone());
                     }
 
                 }
             });
         }
     }
-    public ContactAdapter(AdaptertoFragment _listen, List<Contact_Data> _value, ArrayList<Integer> recordList){
+    public ContactAdapter(AdaptertoFragment _listen, List<Contact_Data> _value, List<String> recordList){
         values = _value;
         chooseList = recordList;
         listener = _listen;
@@ -85,14 +93,12 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         String _phone = contact_data.getPhone();
         holder.name.setText(_name);
         holder.phoneNumber.setText(_phone);
-        for(int i =0;i <chooseList.size();i++){
-            if(position != chooseList.get(i)) {
-                holder.btnSwitch.setChecked(false);
-                continue;
-            }else {
-                holder.btnSwitch.setChecked(true);
-            }
+        if(contact_data.getChoose()) {
+            holder.btnSwitch.setChecked(true);
+        }else {
+            holder.btnSwitch.setChecked(false);
         }
+
     }
     @Override
     public int getItemCount(){

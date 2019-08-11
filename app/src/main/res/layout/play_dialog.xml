@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
-        android:layout_width="400dp"
+        android:layout_width="match_parent"
         android:layout_height="100dp"
         android:weightSum="10"
         android:orientation="horizontal">
@@ -13,20 +14,55 @@
             android:layout_weight="2"
             android:layout_height="match_parent"
             android:background="@mipmap/ic_launcher"
-            android:id="@+id/playButton"/>
+            android:id="@+id/playButton"
+            />
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="8"
             android:orientation="vertical"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            >
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/nameRecord"/>
-            <android.support.v4.widget.ContentLoadingProgressBar
+                android:layout_height="30dp"
+                android:id="@+id/nameRecord"
+
+                />
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/playProgress"/>
+                android:layout_marginRight="5dp"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:id="@+id/position_now"
+                    android:text="00:00"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="5dp"
+                    android:id="@+id/len_file"
+                    android:text="00:00"/>
+                <ProgressBar
+                    android:id="@+id/playProgress"
+
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:maxHeight="10dip"
+                    android:minHeight="10dip"
+                    android:progress="0"
+                    android:secondaryProgress="100"
+                    android:layout_centerVertical="true"
+                    />
+            </RelativeLayout>
 
         </LinearLayout>
     </LinearLayout>

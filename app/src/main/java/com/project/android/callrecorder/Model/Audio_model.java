@@ -3,6 +3,7 @@ package com.project.android.callrecorder.Model;
 public class Audio_model {
     public String fileName;
     public String longTime;
+    private int viewType;
 
     public Audio_model(String _fileName){
         fileName = _fileName;
@@ -14,6 +15,15 @@ public class Audio_model {
     public void setLongTime(String time){
         longTime = time;
     }
+
+    public int getViewType() {
+        return viewType;
+    }
+
+    public void setViewType(int viewType) {
+        this.viewType = viewType;
+    }
+
     public String getFileName(){
         return fileName;
     }

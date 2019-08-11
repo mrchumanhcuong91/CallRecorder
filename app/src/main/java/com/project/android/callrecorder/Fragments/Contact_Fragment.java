@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.project.android.callrecorder.Adapter.ContactAdapter;
+import com.project.android.callrecorder.Database.ContactDataSource;
 import com.project.android.callrecorder.Other.DividerItemDecorator;
 import com.project.android.callrecorder.Model.Contact_Data;
 import com.project.android.callrecorder.R;
@@ -23,13 +24,28 @@ import java.util.List;
 public class Contact_Fragment extends Fragment {
     public static final String TAG = "Contact_Fragment";
     public RecyclerView recyclerView;
-    public ContactAdapter myAdapter ;
-    ArrayList<Integer> chooseList = new ArrayList<Integer>();
+    private ContactDataSource database;
+    List<Contact_Data> list = new ArrayList<Contact_Data>();
+    List<String> chooseList = new ArrayList<String>();
     ContactAdapter.AdaptertoFragment transfer = new ContactAdapter.AdaptertoFragment() {
         @Override
-        public void transferToFragment(int position) {
-            Log.e("CuongCM","transferToFragment " +position);
-            chooseList.add(position);
+        public void transferToFragment(String phoneNum) {
+            if(!chooseList.contains(phoneNum)){
+                Log.e("CuongCM","transferToFragment " +phoneNum);
+                Contact_Data contact_data = searchContact(phoneNum);
+                if(contact_data != null){
+                    contact_data.setChoose(true);
+                }
+                chooseList.add(phoneNum);
+            }
+        }
+        @Override
+        public void transferToFragmentRemove(String phoneNum){
+            chooseList.remove(phoneNum);
+            Contact_Data contact_data = searchContact(phoneNum);
+            if(contact_data != null){
+                contact_data.setChoose(false);
+            }
         }
     };
 
@@ -38,6 +54,28 @@ public class Contact_Fragment extends Fragment {
     public void onCreate( Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         Log.e("CuongCM","onCreate");
+        if(list.size() ==0){
+            list = getAllContact();
+        }
+        //read data from db first
+
+        if(chooseList.size() == 0){
+            if(database == null){
+                database = new ContactDataSource(getContext());
+                database.openRead();
+            }
+            chooseList = database.getSelectContact();
+            database.close();
+            for(int i =0;i< chooseList.size();i++){
+                String temp = chooseList.get(i);
+                Log.e("CuongCM","onCreate " +temp);
+
+                Contact_Data contact_data = searchContact(temp);
+                if(contact_data != null){
+                    contact_data.setChoose(true);
+                }
+            }
+        }
 
 //        if(savedInstanceState != null)
 //            chooseList = savedInstanceState.getIntegerArrayList(ConstantRC.CHOOSE_LIST);
@@ -48,12 +86,11 @@ public class Contact_Fragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.contact_fragment,
                 container, false);
-        Log.e("CuongCM","onCreateView");
+        Log.e("CuongCM","onCreateView "+ list.size());
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recContact);
         RecyclerView.ItemDecoration itemDecorator = new DividerItemDecorator(ContextCompat.getDrawable(getContext(),R.drawable.divider));
         recyclerView.addItemDecoration(itemDecorator);
-        List<Contact_Data> list = getAllContact();
         if (list.size() == 0)
             return view;
         ContactAdapter myAdapter = new ContactAdapter(transfer, list, chooseList);
@@ -81,6 +118,37 @@ public class Contact_Fragment extends Fragment {
 
 
     }
+    @Override
+    public void onPause(){
+        super.onPause();
+        Log.e("CuongCM","onPause "+ chooseList.size());
+
+        //merge list and chooseList
+        for(int i =0;i< chooseList.size();i++){
+            String temp = chooseList.get(i);
+            Contact_Data contact_data = searchContact(temp);
+            if(contact_data != null){
+                contact_data.setChoose(true);
+            }
+        }
+    }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        //save data contact to db
+        if(database == null)
+            database = new ContactDataSource(getContext());
+        if(database != null){
+            database.open();
+            database.deleteAllContact();
+            for(int i=0; i< chooseList.size();i++){
+                String phoneTemp = chooseList.get(i);
+                database.saveContactDb(phoneTemp);
+
+            }
+            database.close();
+        }
+    }
     public List<Contact_Data> getAllContact() {
 
 
@@ -90,14 +158,25 @@ public class Contact_Fragment extends Fragment {
             String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-            Contact_Data Contact_Data = new Contact_Data();
-            Contact_Data.setName(name);
-            Contact_Data.setPhone(phoneNumber);
-            contactModelArrayList.add(Contact_Data);
+            Contact_Data contact_data = new Contact_Data();
+            contact_data.setName(name);
+            contact_data.setPhone(phoneNumber);
+            contact_data.setChoose(false);
+            contactModelArrayList.add(contact_data);
             Log.d("name>>", name + "  " + phoneNumber);
         }
         phones.close();
         return contactModelArrayList;
+    }
+    public Contact_Data searchContact(String phoneNum){
+        Contact_Data contact_data ;
+        for(int i =0;i< list.size(); i++){
+            contact_data = list.get(i);
+            String phoneTemp = contact_data.getPhone();
+            if(phoneNum.compareTo(phoneTemp) ==0)
+                return contact_data;
+        }
+        return null;
     }
 
 

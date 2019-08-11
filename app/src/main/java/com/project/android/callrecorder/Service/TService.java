@@ -16,6 +16,8 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.project.android.callrecorder.Database.ContactDataSource;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -26,7 +28,7 @@ import java.util.logging.Handler;
 public class TService extends Service {
     MediaRecorder recorder;
     File audiofile;
-    String name, phonenumber;
+    private ContactDataSource dataSource;
     String audio_format;
     public String Audio_Type;
     int audioSource;
@@ -52,6 +54,7 @@ public class TService extends Service {
     public void onDestroy() {
 
         super.onDestroy();
+        dataSource.close();
 
     }
 
@@ -59,10 +62,14 @@ public class TService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         final IntentFilter filter = new IntentFilter();
+        dataSource = new ContactDataSource(getApplicationContext());
+
         filter.addAction(ACTION_OUT);
         filter.addAction(ACTION_IN);
-        this.br_call = new CallBr();
+        if(this.br_call == null)
+            this.br_call = new CallBr();
         this.registerReceiver(this.br_call, filter);
+
         return START_STICKY;
     }
 
@@ -115,6 +122,14 @@ public class TService extends Service {
                     state = bundle.getString(TelephonyManager.EXTRA_STATE);
                     if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
                         inCall = bundle.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
+                        if(dataSource != null ){
+                            dataSource.openRead();
+                            if(dataSource.Exists(inCall)) {
+                                dataSource.close();
+                                return;
+                            }
+                            dataSource.close();
+                        }
                         contacName = getContactName(inCall, context);
                         wasRinging = true;
                         Toast.makeText(context, "IN : " + inCall, Toast.LENGTH_LONG).show();
@@ -137,6 +152,14 @@ public class TService extends Service {
             } else if (intent.getAction().equals(ACTION_OUT)) {
                 if ((bundle = intent.getExtras()) != null) {
                     outCall = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+                    if(dataSource != null ){
+                        dataSource.openRead();
+                        if(dataSource.Exists(outCall)) {
+                            dataSource.close();
+                            return;
+                        }
+                        dataSource.close();
+                    }
                     Toast.makeText(context, "OUT : " + outCall, Toast.LENGTH_LONG).show();
                     contacName = getContactName(outCall, context);
                     startRecord("outgoing_"+contacName);
